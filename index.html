@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VIP MEMBERS CARD</title>
+    <style>
+        /* 簡単なカード風のデザイン */
+        body { font-family: 'Helvetica Neue', Arial, sans-serif; background: #1a1a1a; color: #fff; text-align: center; padding: 20px; }
+        .card-container { background: linear-gradient(135deg, #2c3e50, #000000); border-radius: 15px; padding: 30px; box-shadow: 0 8px 20px rgba(0,0,0,0.5); margin: 20px auto; max-width: 350px; border: 1px solid #d4af37; }
+        h1 { color: #d4af37; font-size: 24px; margin-bottom: 5px; }
+        .user-name { font-size: 20px; font-weight: bold; margin: 20px 0; }
+        .points { font-size: 28px; color: #d4af37; font-weight: bold; }
+        .coupon-box { background: rgba(255,255,255,0.1); border: 1px dashed #fff; border-radius: 8px; padding: 15px; margin-top: 25px; }
+    </style>
+
+    <!-- 【ここにGA4の測定タグ（G-XXXXXXXXXX）を貼り付けます】 -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=YOUR_GA4_ID"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+    </script>
+</head>
+<body>
+
+    <div class="card-container">
+        <h1>VIP PREMIUM PASS</h1>
+        <div id="vip-id" style="font-size: 12px; color: #aaa;">ID: Loading...</div>
+        
+        <!-- ここがユーザーごとに書き換わる部分 -->
+        <div class="user-name" id="user-name">Loading...</div>
+        <div>現在の保有ポイント</div>
+        <div class="points" id="user-points">0 <span style="font-size:16px;">pt</span></div>
+        
+        <div class="coupon-box">
+            <div style="font-size:12px; color:#aaa;">今月の限定特典</div>
+            <div id="coupon-text">Loading...</div>
+        </div>
+    </div>
+
+    <!-- 制御用のJavaScript読み込み -->
+    <script src="script.js"></script>
+</body>
+</html>
+// 1. URLからパラメーター（?id=xxxx）を取得する
+const urlParams = new URLSearchParams(window.location.search);
+const vipId = urlParams.get('id') || 'default';
+
+// 2. プロトタイプ用のダミーデータ（本来はここをスプレッドシート等から引っ張る、まずはコード内に用意）
+const vipDatabase = {
+    'vip001': { name: '田中 太郎 様', points: '12,500', coupon: 'お会計から10%OFF ＆ ウェルカムドリンク無料' },
+    'vip002': { name: '佐藤 次郎 様', points: '4,800',  coupon: 'デザート一品サービス' },
+    'default': { name: 'GUEST 様', points: '0',  coupon: '新規ご入会クーポン発行中' }
+};
+
+// 3. 該当するIDのデータを取得
+const userData = vipDatabase[vipId] || vipDatabase['default'];
+
+// 4. HTMLの画面書き換え
+document.getElementById('vip-id').innerText = `ID: ${vipId.toUpperCase()}`;
+document.getElementById('user-name').innerText = userData.name;
+document.getElementById('user-points').innerText = `${userData.points} pt`;
+document.getElementById('coupon-text').innerText = userData.coupon;
+
+// 5. 【重要】GA4に「誰がアクセスしたか」のカスタムデータを送る
+gtag('config', 'YOUR_GA4_ID', {
+  'user_id': vipId, // 会員IDを紐付け
+  'custom_map': {'dimension1': 'vip_id_dimension'}
+});
+gtag('event', 'vip_card_scan', { 'vip_id': vipId });
